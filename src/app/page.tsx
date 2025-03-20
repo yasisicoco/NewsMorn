@@ -1,103 +1,163 @@
-import Image from "next/image";
+"use client";
+
+import { useEffect, useState } from "react";
+import { fetchNews } from "@/utils/fetchNews";
+import { summarizeNews } from "@/utils/summarizeNews";
+
+import { useTheme } from "next-themes";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
+
+interface Article {
+  title: string;
+  link: string;
+  description: string;
+  content: string;
+  source_name: string;
+}
+
+const categories = [
+  "top",
+  "sports",
+  "technology",
+  "business",
+  "science",
+  "entertainment",
+  "health",
+  "world",
+  "politics",
+  "environment",
+  "food",
+];
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [articles, setArticles] = useState<Article[]>([]);
+  const [category, setCategory] = useState("top");
+  const [loading, setLoading] = useState(false);
+  const [summaries, setSummaries] = useState<{ [key: number]: string }>({});
+  const { theme, setTheme } = useTheme();
+  const [isClient, setIsClient] = useState(false); // 🛠️ 다크모드 관련 Hydration 문제 방지
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+  useEffect(() => {
+    setIsClient(true); // 🛠️ 클라이언트에서만 실행되도록 설정
+  }, []);
+
+  useEffect(() => {
+    async function loadNews() {
+      setLoading(true);
+      const news = await fetchNews(category);
+      console.log("뉴스 데이터:", news);
+      setArticles(news);
+      setLoading(false);
+    }
+    loadNews();
+  }, [category]); // 카테고리 변경 시만 API 호출
+
+  const handleSummarize = async (index: number, content: string) => {
+    if (!content) return;
+
+    const summary = await summarizeNews(content, "short");
+    setSummaries((prev) => ({ ...prev, [index]: summary }));
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-4">
+      {/* 헤더 (정렬 수정) */}
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+          NewsMorn - AI 뉴스 요약
+        </h1>
+        {/* 🛠️ isClient 추가: 서버에서 hydration mismatch 방지 */}
+        {isClient && (
+          <Button onClick={() => setTheme(theme === "dark" ? "light" : "dark")}>
+            {theme === "dark" ? "☀️ 라이트 모드" : "🌙 다크 모드"}
+          </Button>
+        )}
+      </div>
+
+      {/* 네비게이션 바 (Carousel + Card 적용) () (md >= 768) (lg >= 960) */}
+      <Carousel className="w-full max-w-2xl mx-auto mt-4">
+        <CarouselContent className="-ml-1">
+          {categories.map((cat, index) => (
+            <CarouselItem
+              key={index}
+              className="pl-1 md:basis-1/3 lg:basis-1/4"
+            >
+              <div className="p-1">
+                <Card
+                  onClick={() => setCategory(cat)}
+                  className={`cursor-pointer text-center ${
+                    category === cat
+                      ? "bg-blue-600 text-white dark:bg-blue-500"
+                      : "bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-300"
+                  }`}
+                >
+                  <CardContent className="p-4">
+                    <span className="text-md font-semibold">
+                      {cat.toUpperCase()}
+                    </span>
+                  </CardContent>
+                </Card>
+              </div>
+            </CarouselItem>
+          ))}
+        </CarouselContent>
+        <CarouselPrevious />
+        <CarouselNext />
+      </Carousel>
+
+      {/* 로딩 표시 */}
+      {loading && (
+        <p className="text-center text-gray-500 dark:text-gray-300 mt-4">
+          뉴스 불러오는 중...
+        </p>
+      )}
+
+      {/* 뉴스 카드 리스트 */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+        {articles.map((article, index) => (
+          <div
+            key={index}
+            className="p-4 bg-white dark:bg-gray-800 shadow rounded-lg"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+            <h2 className="text-lg font-semibold mt-2 text-gray-900 dark:text-gray-100">
+              {article.title}
+            </h2>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              {article.source_name}
+            </p>
+            <p className="text-sm mt-2 text-gray-700 dark:text-gray-300">
+              {summaries[index] ||
+              (article.description && article.description.length > 150)
+                ? article.description.slice(0, 150) + "..."
+                : article.description || "설명이 없습니다."}
+            </p>
+
+            <div className="mt-2 flex space-x-2">
+              <Button asChild>
+                <a
+                  href={article.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  기사 보기
+                </a>
+              </Button>
+
+              <Button onClick={() => handleSummarize(index, article.content)}>
+                요약하기
+              </Button>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
