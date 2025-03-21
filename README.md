@@ -66,10 +66,19 @@ bun dev
 - `newsdata.io`에서 제공하는 `link`(기사 원문 URL)를 사용하여 직접 본문을 가져오기.
 - AI 요약을 생성할 때 원문을 크롤링하여 텍스트 데이터를 확보 후 요약.
 
+**해결 방법 2:**
+
+- `newsdata.io`에서 제공하는 description만을 사용하여 ai로 정리하여 제공
+
 ---
 
 ## 🚀 다음 작업 예정
 
-- 다크모드 `hydration mismatch` 문제를 `useSyncExternalStore`로 해결 시도.
-- `newsdata.io` API를 Next.js API Route를 통해 프록시 처리.
-- 뉴스 본문 크롤링 기능을 추가하여 **유료 플랜 없이도 요약 기능 제공 가능하도록 개선.**
+- [x] 다크모드 `hydration mismatch` 문제를 `useSyncExternalStore`로 해결 시도.
+- [x] `newsdata.io` API를 Next.js API Route를 통해 프록시 처리.
+- [ ] ~~뉴스 본문 크롤링 기능을 추가하여 유료 플랜 없이도 요약 기능 제공 가능하도록 개선~~ 배포서버의 한계
+- [ ] OpenAI 요약기능 수정
+- [ ] 디자인 수정
+- [ ] Darkmode, Lightmode 수정
+- [ ] Skeleton UI 기능 추가
+- [ ] Deploy

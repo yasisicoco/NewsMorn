@@ -1,16 +1,13 @@
-export async function summarizeNews(
-  content: string,
-  length: "short" | "long" = "short"
-) {
+export async function summarizeNews(description: string) {
   try {
     const res = await fetch("/api/openai", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ content, length }),
+      body: JSON.stringify({ description }), // ✅ key를 'description'으로 변경
     });
 
     if (!res.ok) {
-      const errorData = await res.json().catch(() => null); // JSON 파싱 실패 방지
+      const errorData = await res.json().catch(() => null);
       throw new Error(
         errorData?.error || `⚠️ 서버 오류: ${res.status} ${res.statusText}`
       );

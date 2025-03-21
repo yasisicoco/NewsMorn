@@ -5,32 +5,77 @@ const client = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-export async function POST(req: Request) {
-  try {
-    const { content, length } = await req.json();
+interface SummaryItem {
+  1: string;
+  2: string;
+  3: string;
+}
 
-    const completion = await client.chat.completions.create({
+interface SummaryResponse {
+  summary: SummaryItem[];
+}
+
+const generateDescriptionSummarize = async (
+  description: string
+): Promise<SummaryResponse> => {
+  const prompt = `
+너는 사용자가 원하는 뉴스를 세줄 요약하는 전문가야. 각 요약문장은 30자가 넘지 않게 핵심만,
+출력 형식은 JSON이어야 하고, 영어 뉴스라면 한글로 번역해줘.
+
+## 출력 형식 예시:
+{
+  "summary": [
+    {
+      "1": "1. 첫 번째 문장",
+      "2": "2. 두 번째 문장",
+      "3": "3. 세 번째 문장"
+    }
+  ]
+}`;
+
+  try {
+    const response = await client.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [
-        {
-          role: "system",
-          content: `Summarize the news provided by the user. Summarize length ${
-            length === "short" ? "short" : "long"
-          }.`,
-        },
-        {
-          role: "user",
-          content: content,
-        },
+        { role: "system", content: prompt },
+        { role: "user", content: description },
       ],
+      response_format: { type: "json_object" },
       temperature: 0.7,
-      max_tokens: length === "short" ? 50 : 100, // 50: 약 2줄, 150: ~4~5줄
+      max_tokens: 100,
     });
-    console.log(completion.choices[0].message.content);
 
-    return NextResponse.json({
-      summary: completion.choices[0].message.content,
-    });
+    const content = response.choices[0].message?.content;
+
+    if (!content) {
+      console.error("⚠️ OpenAI 응답이 비어 있음.");
+      throw new Error("OpenAI 응답이 없습니다.");
+    }
+
+    console.log("GPT 응답 원본:", content);
+
+    const parsed = JSON.parse(content);
+    return parsed as SummaryResponse;
+  } catch (error) {
+    console.error("OpenAI API 요청 실패:", error);
+    throw new Error("요약을 생성할 수 없습니다.");
+  }
+};
+
+export async function POST(req: Request) {
+  try {
+    const { description } = await req.json();
+
+    if (!description || typeof description !== "string") {
+      return NextResponse.json(
+        { error: "뉴스 내용을 입력해주세요." },
+        { status: 400 }
+      );
+    }
+
+    const summary = await generateDescriptionSummarize(description);
+
+    return NextResponse.json({ summary });
   } catch (error: unknown) {
     console.error("OpenAI API 요청 실패:", error);
 

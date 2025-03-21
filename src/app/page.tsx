@@ -19,9 +19,19 @@ interface Article {
   title: string;
   link: string;
   description: string;
-  content: string;
   source_name: string;
 }
+
+interface SummaryItem {
+  1: string;
+  2: string;
+  3: string;
+}
+
+// 요약 결과 구조
+type SummaryMap = {
+  [index: number]: SummaryItem;
+};
 
 const categories = [
   "top",
@@ -41,12 +51,12 @@ export default function Home() {
   const [articles, setArticles] = useState<Article[]>([]);
   const [category, setCategory] = useState("top");
   const [loading, setLoading] = useState(false);
-  const [summaries, setSummaries] = useState<{ [key: number]: string }>({});
+  const [summaries, setSummaries] = useState<SummaryMap>({});
   const { theme, setTheme } = useTheme();
-  const [isClient, setIsClient] = useState(false); // 🛠️ 다크모드 관련 Hydration 문제 방지
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
-    setIsClient(true); // 🛠️ 클라이언트에서만 실행되도록 설정
+    setIsClient(true);
   }, []);
 
   useEffect(() => {
@@ -58,23 +68,28 @@ export default function Home() {
       setLoading(false);
     }
     loadNews();
-  }, [category]); // 카테고리 변경 시만 API 호출
+  }, [category]);
 
-  const handleSummarize = async (index: number, content: string) => {
-    if (!content) return;
+  const handleSummarize = async (index: number, description: string) => {
+    if (!description || description.trim() === "") {
+      alert("요약할 설명이 없습니다.");
+      return;
+    }
 
-    const summary = await summarizeNews(content, "short");
-    setSummaries((prev) => ({ ...prev, [index]: summary }));
+    const response = await summarizeNews(description); // 🔄 수정
+    const summaryArray = response?.summary;
+
+    if (Array.isArray(summaryArray) && summaryArray.length > 0) {
+      setSummaries((prev) => ({ ...prev, [index]: summaryArray[0] }));
+    }
   };
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-4">
-      {/* 헤더 (정렬 수정) */}
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
           NewsMorn - AI 뉴스 요약
         </h1>
-        {/* 🛠️ isClient 추가: 서버에서 hydration mismatch 방지 */}
         {isClient && (
           <Button onClick={() => setTheme(theme === "dark" ? "light" : "dark")}>
             {theme === "dark" ? "☀️ 라이트 모드" : "🌙 다크 모드"}
@@ -82,7 +97,6 @@ export default function Home() {
         )}
       </div>
 
-      {/* 네비게이션 바 (Carousel + Card 적용) () (md >= 768) (lg >= 960) */}
       <Carousel className="w-full max-w-2xl mx-auto mt-4">
         <CarouselContent className="-ml-1">
           {categories.map((cat, index) => (
@@ -113,50 +127,66 @@ export default function Home() {
         <CarouselNext />
       </Carousel>
 
-      {/* 로딩 표시 */}
       {loading && (
         <p className="text-center text-gray-500 dark:text-gray-300 mt-4">
           뉴스 불러오는 중...
         </p>
       )}
 
-      {/* 뉴스 카드 리스트 */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-        {articles.map((article, index) => (
-          <div
-            key={index}
-            className="p-4 bg-white dark:bg-gray-800 shadow rounded-lg"
-          >
-            <h2 className="text-lg font-semibold mt-2 text-gray-900 dark:text-gray-100">
-              {article.title}
-            </h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              {article.source_name}
-            </p>
-            <p className="text-sm mt-2 text-gray-700 dark:text-gray-300">
-              {summaries[index] ||
-              (article.description && article.description.length > 150)
-                ? article.description.slice(0, 150) + "..."
-                : article.description || "설명이 없습니다."}
-            </p>
+        {articles.map((article, index) => {
+          const summary = summaries[index];
 
-            <div className="mt-2 flex space-x-2">
-              <Button asChild>
-                <a
-                  href={article.link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  기사 보기
-                </a>
-              </Button>
+          return (
+            <div
+              key={index}
+              className="p-4 bg-white dark:bg-gray-800 shadow rounded-lg"
+            >
+              <h2 className="text-lg font-semibold mt-2 text-gray-900 dark:text-gray-100">
+                {article.title}
+              </h2>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                {article.source_name}
+              </p>
+              <p className="text-sm mt-2 text-gray-700 dark:text-gray-300">
+                {article.description || "설명이 없습니다."}
+              </p>
 
-              <Button onClick={() => handleSummarize(index, article.content)}>
-                요약하기
-              </Button>
+              {summary && (
+                <div className="mt-4 bg-blue-50 dark:bg-blue-900 p-4 rounded-lg shadow-inner">
+                  <h3 className="font-semibold text-gray-800 dark:text-white mb-2">
+                    요약
+                  </h3>
+                  <ul className="list-disc list-inside text-gray-700 dark:text-gray-100 space-y-1">
+                    <li>{summary["1"]}</li>
+                    <li>{summary["2"]}</li>
+                    <li>{summary["3"]}</li>
+                  </ul>
+                </div>
+              )}
+
+              <div className="mt-2 flex space-x-2">
+                <Button asChild>
+                  <a
+                    href={article.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    기사 보기
+                  </a>
+                </Button>
+
+                {article.description && (
+                  <Button
+                    onClick={() => handleSummarize(index, article.description)}
+                  >
+                    요약하기
+                  </Button>
+                )}
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
