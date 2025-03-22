@@ -11,8 +11,6 @@ import {
   Carousel,
   CarouselContent,
   CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
 } from "@/components/ui/carousel";
 
 interface Article {
@@ -85,46 +83,45 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-4">
+    <div className="min-h-screen bg-gray-100 px-5 w-full max-w-[1920px] mx-auto dark:bg-gray-900">
       <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+        <h1 className="text-xl font-bold mt-4 text-gray-900 dark:text-gray-100">
           NewsMorn - AI 뉴스 요약
         </h1>
         {isClient && (
-          <Button onClick={() => setTheme(theme === "dark" ? "light" : "dark")}>
+          <Button
+            className="mt-4"
+            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+          >
             {theme === "dark" ? "☀️ 라이트 모드" : "🌙 다크 모드"}
           </Button>
         )}
       </div>
 
-      <Carousel className="w-full max-w-2xl mx-auto mt-4">
+      <Carousel className="w-full mx-auto">
         <CarouselContent className="-ml-1">
           {categories.map((cat, index) => (
             <CarouselItem
               key={index}
-              className="pl-1 md:basis-1/3 lg:basis-1/4"
+              className="pl-1 md:basis-1/4 lg:basis-1/5"
             >
-              <div className="p-1">
-                <Card
-                  onClick={() => setCategory(cat)}
-                  className={`cursor-pointer text-center ${
-                    category === cat
-                      ? "bg-blue-600 text-white dark:bg-blue-500"
-                      : "bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-300"
-                  }`}
-                >
-                  <CardContent className="p-4">
-                    <span className="text-md font-semibold">
-                      {cat.toUpperCase()}
-                    </span>
-                  </CardContent>
-                </Card>
-              </div>
+              <Card
+                onClick={() => setCategory(cat)}
+                className={`cursor-pointer text-center ${
+                  category === cat
+                    ? "bg-blue-600 text-white dark:bg-blue-500"
+                    : "bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-300"
+                }`}
+              >
+                <CardContent>
+                  <span className="text-sm font-semibold">
+                    {cat.toUpperCase()}
+                  </span>
+                </CardContent>
+              </Card>
             </CarouselItem>
           ))}
         </CarouselContent>
-        <CarouselPrevious />
-        <CarouselNext />
       </Carousel>
 
       {loading && (
