@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { fetchNews } from "@/utils/fetchNews";
 import { summarizeNews } from "@/utils/summarizeNews";
 
@@ -68,19 +68,22 @@ export default function Home() {
     setSummaries({});
   }, [category]);
 
-  const handleSummarize = async (link: string, description: string) => {
-    if (!description || description.trim() === "") {
-      alert("요약할 설명이 없습니다.");
-      return;
-    }
+  const handleSummarize = useCallback(
+    async (link: string, description: string) => {
+      if (!description || description.trim() === "") {
+        alert("요약할 설명이 없습니다.");
+        return;
+      }
 
-    const response = await summarizeNews(description);
-    const summaryArray = response?.summary;
+      const response = await summarizeNews(description);
+      const summaryArray = response?.summary;
 
-    if (Array.isArray(summaryArray) && summaryArray.length > 0) {
-      setSummaries((prev) => ({ ...prev, [link]: summaryArray[0] }));
-    }
-  };
+      if (Array.isArray(summaryArray) && summaryArray.length > 0) {
+        setSummaries((prev) => ({ ...prev, [link]: summaryArray[0] }));
+      }
+    },
+    []
+  );
 
   return (
     <div className="min-h-screen bg-background px-5 pb-5 w-full max-w-[1920px] mx-auto">
@@ -106,7 +109,9 @@ export default function Home() {
               className="pl-1 basis-1/2 md:basis-1/5 lg:basis-1/7"
             >
               <Card
-                onClick={() => setCategory(cat)}
+                onClick={() => {
+                  if (cat !== category) setCategory(cat);
+                }}
                 className={`w-full h-full cursor-pointer text-center border-none overflow-hidden transition-all ${
                   category === cat
                     ? "bg-white text-zinc-900 font-bold dark:bg-[#09090B] dark:text-[#FAFAFA]"
