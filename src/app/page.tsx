@@ -60,6 +60,7 @@ export default function Home() {
     async function loadNews() {
       setLoading(true);
       const news = await fetchNews(category);
+      // console.log("뉴스 데이터:", news);
       setArticles(news);
       setLoading(false);
     }
@@ -102,17 +103,17 @@ export default function Home() {
           {categories.map((cat, index) => (
             <CarouselItem
               key={index}
-              className="pl-1 basis-1/3 md:basis-1/5 lg:basis-1/7"
+              className="pl-1 basis-1/2 md:basis-1/5 lg:basis-1/7"
             >
               <Card
                 onClick={() => setCategory(cat)}
-                className={`cursor-pointer text-center border-none ${
+                className={`w-full h-full cursor-pointer text-center border-none overflow-hidden transition-all ${
                   category === cat
                     ? "bg-white text-zinc-900 font-bold dark:bg-[#09090B] dark:text-[#FAFAFA]"
                     : "bg-[#F4F4F5] text-zinc-400 dark:bg-[#27272A] dark:text-[#626268]"
                 }`}
               >
-                <CardContent>
+                <CardContent className="w-full p-0">
                   <span className="text-sm font-mono">{cat.toUpperCase()}</span>
                 </CardContent>
               </Card>
@@ -128,12 +129,12 @@ export default function Home() {
       )}
 
       <div className="font-sans columns-1 md:columns-2 gap-4 mt-4">
-        {articles.map((article, link) => {
+        {articles.map((article) => {
           const summary = summaries[article.link];
 
           return (
             <div
-              key={link}
+              key={article.link}
               className="mb-4 break-inside-avoid rounded-xl border bg-background text-card-foreground shadow"
             >
               <div className="p-6 flex flex-row items-center justify-between space-y-0 pb-2">
