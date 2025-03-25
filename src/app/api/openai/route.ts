@@ -52,7 +52,7 @@ const generateDescriptionSummarize = async (
       throw new Error("OpenAI 응답이 없습니다.");
     }
 
-    console.log("GPT 응답 원본:", content);
+    // console.log("GPT 응답 원본:", content);
 
     const parsed = JSON.parse(content);
     return parsed as SummaryResponse;
