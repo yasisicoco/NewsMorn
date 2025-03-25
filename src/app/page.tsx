@@ -26,9 +26,8 @@ interface SummaryItem {
   3: string;
 }
 
-// 요약 결과 구조
 type SummaryMap = {
-  [index: number]: SummaryItem;
+  [key: string]: SummaryItem;
 };
 
 const categories = [
@@ -66,57 +65,56 @@ export default function Home() {
       setLoading(false);
     }
     loadNews();
+    setSummaries({});
   }, [category]);
 
-  const handleSummarize = async (index: number, description: string) => {
+  const handleSummarize = async (link: string, description: string) => {
     if (!description || description.trim() === "") {
       alert("요약할 설명이 없습니다.");
       return;
     }
 
-    const response = await summarizeNews(description); // 🔄 수정
+    const response = await summarizeNews(description);
     const summaryArray = response?.summary;
 
     if (Array.isArray(summaryArray) && summaryArray.length > 0) {
-      setSummaries((prev) => ({ ...prev, [index]: summaryArray[0] }));
+      setSummaries((prev) => ({ ...prev, [link]: summaryArray[0] }));
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 px-5 w-full max-w-[1920px] mx-auto dark:bg-gray-900">
+    <div className="min-h-screen bg-background px-5 pb-5 w-full max-w-[1920px] mx-auto">
       <div className="flex justify-between items-center mb-4">
-        <h1 className="text-xl font-bold mt-4 text-gray-900 dark:text-gray-100">
-          NewsMorn - AI 뉴스 요약
+        <h1 className="text-xl font-mono mt-4 text-foreground">
+          NewsMorn - AI요약
         </h1>
         {isClient && (
           <Button
-            className="mt-4"
+            className="mt-4 cursor-pointer bg-card border"
             onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
           >
-            {theme === "dark" ? "☀️ 라이트 모드" : "🌙 다크 모드"}
+            {theme === "dark" ? "☀️" : "🌙"}
           </Button>
         )}
       </div>
 
-      <Carousel className="w-full mx-auto">
-        <CarouselContent className="-ml-1">
+      <Carousel className="w-full mx-auto bg-[#F4F4F5] p-2 rounded-lg dark:bg-[#27272A]">
+        <CarouselContent className="-ml-1 ">
           {categories.map((cat, index) => (
             <CarouselItem
               key={index}
-              className="pl-1 md:basis-1/4 lg:basis-1/5"
+              className="pl-1 basis-1/3 md:basis-1/5 lg:basis-1/7"
             >
               <Card
                 onClick={() => setCategory(cat)}
-                className={`cursor-pointer text-center ${
+                className={`cursor-pointer text-center border-none ${
                   category === cat
-                    ? "bg-blue-600 text-white dark:bg-blue-500"
-                    : "bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-300"
+                    ? "bg-white text-zinc-900 font-bold dark:bg-[#09090B] dark:text-[#FAFAFA]"
+                    : "bg-[#F4F4F5] text-zinc-400 dark:bg-[#27272A] dark:text-[#626268]"
                 }`}
               >
                 <CardContent>
-                  <span className="text-sm font-semibold">
-                    {cat.toUpperCase()}
-                  </span>
+                  <span className="text-sm font-mono">{cat.toUpperCase()}</span>
                 </CardContent>
               </Card>
             </CarouselItem>
@@ -125,45 +123,61 @@ export default function Home() {
       </Carousel>
 
       {loading && (
-        <p className="text-center text-gray-500 dark:text-gray-300 mt-4">
+        <p className="text-center text-muted-foreground mt-4">
           뉴스 불러오는 중...
         </p>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+      <div className="font-sans columns-1 md:columns-2 gap-4 mt-4">
         {articles.map((article, index) => {
-          const summary = summaries[index];
+          const summary = summaries[article.link];
 
           return (
             <div
               key={index}
-              className="p-4 bg-white dark:bg-gray-800 shadow rounded-lg"
+              className="mb-4 break-inside-avoid rounded-xl border bg-background text-card-foreground shadow"
             >
-              <h2 className="text-lg font-semibold mt-2 text-gray-900 dark:text-gray-100">
-                {article.title}
-              </h2>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                {article.source_name}
-              </p>
-              <p className="text-sm mt-2 text-gray-700 dark:text-gray-300">
-                {article.description || "설명이 없습니다."}
-              </p>
+              <div className="p-6 flex flex-row items-center justify-between space-y-0 pb-2">
+                <p className="text-base font-bold">{article.title}</p>
+              </div>
+              <div className="p-6 pt-0 pb-0">
+                <p className="text-xs text-muted-foreground">
+                  {article.source_name}
+                </p>
 
-              {summary && (
-                <div className="mt-4 bg-blue-50 dark:bg-blue-900 p-4 rounded-lg shadow-inner">
-                  <h3 className="font-semibold text-gray-800 dark:text-white mb-2">
-                    요약
-                  </h3>
-                  <ul className="list-disc list-inside text-gray-700 dark:text-gray-100 space-y-1">
-                    <li>{summary["1"]}</li>
-                    <li>{summary["2"]}</li>
-                    <li>{summary["3"]}</li>
-                  </ul>
-                </div>
-              )}
+                {!summary && (
+                  <p className="text-sm mt-2 text-foreground">
+                    {article.description || "설명이 없습니다."}
+                  </p>
+                )}
 
-              <div className="mt-2 flex space-x-2">
-                <Button asChild>
+                {summary && (
+                  <div className="mt-2 bg-primary/10 p-4 rounded-lg shadow-inner">
+                    <h3 className="font-sans text-primary mb-2">세줄요약</h3>
+                    <ul className="list-disc list-inside text-sm font-sans text-foreground space-y-1">
+                      <li>{summary["1"]}</li>
+                      <li>{summary["2"]}</li>
+                      <li>{summary["3"]}</li>
+                    </ul>
+                  </div>
+                )}
+              </div>
+
+              <div className="mt-4 flex flex-col md:flex-row justify-end gap-2 px-6 pb-4">
+                {article.description && (
+                  <Button
+                    className="cursor-pointer bg-background text-foreground border"
+                    onClick={() =>
+                      handleSummarize(article.link, article.description)
+                    }
+                  >
+                    요약하기
+                  </Button>
+                )}
+                <Button
+                  className="bg-background text-foreground border"
+                  asChild
+                >
                   <a
                     href={article.link}
                     target="_blank"
@@ -172,14 +186,6 @@ export default function Home() {
                     기사 보기
                   </a>
                 </Button>
-
-                {article.description && (
-                  <Button
-                    onClick={() => handleSummarize(index, article.description)}
-                  >
-                    요약하기
-                  </Button>
-                )}
               </div>
             </div>
           );
