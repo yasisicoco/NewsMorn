@@ -60,7 +60,6 @@ export default function Home() {
     async function loadNews() {
       setLoading(true);
       const news = await fetchNews(category);
-      console.log("뉴스 데이터:", news);
       setArticles(news);
       setLoading(false);
     }
@@ -129,12 +128,12 @@ export default function Home() {
       )}
 
       <div className="font-sans columns-1 md:columns-2 gap-4 mt-4">
-        {articles.map((article, index) => {
+        {articles.map((article, link) => {
           const summary = summaries[article.link];
 
           return (
             <div
-              key={index}
+              key={link}
               className="mb-4 break-inside-avoid rounded-xl border bg-background text-card-foreground shadow"
             >
               <div className="p-6 flex flex-row items-center justify-between space-y-0 pb-2">
