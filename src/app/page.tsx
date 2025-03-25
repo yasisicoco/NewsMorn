@@ -90,7 +90,7 @@ export default function Home() {
         </h1>
         {isClient && (
           <Button
-            className="mt-4 cursor-pointer bg-card border"
+            className="mt-4 cursor-pointer bg-background border"
             onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
           >
             {theme === "dark" ? "☀️" : "🌙"}
