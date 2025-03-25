@@ -1,6 +1,14 @@
 import { NextResponse } from "next/server";
 
 export async function GET(req: Request) {
+  // ✅ 서비스 점검 모드 확인
+  if (process.env.NEXT_PUBLIC_MAINTENANCE_MODE === "true") {
+    return NextResponse.json(
+      { message: "서비스 점검 중입니다." },
+      { status: 503 }
+    );
+  }
+
   const url = new URL(req.url);
   const category = url.searchParams.get("category") || "top";
   const apiKey = process.env.NEWSDATA_IO_API_KEY;
