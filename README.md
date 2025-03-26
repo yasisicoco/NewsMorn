@@ -105,4 +105,4 @@ bun dev
 - [x] Vercel 배포
 - [x] news/route.ts 의 api소진, serviceMaintenance 분기처리 추가
 - [ ] `metadata` 추가
-- [ ] vercel `webanalysis` 추가
+- [x] vercel `speed-insights` 추가
