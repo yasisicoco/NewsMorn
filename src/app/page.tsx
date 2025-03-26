@@ -52,6 +52,7 @@ export default function Home() {
   const [summaries, setSummaries] = useState<SummaryMap>({});
   const { theme, setTheme } = useTheme();
   const [isClient, setIsClient] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
     setIsClient(true);
@@ -61,7 +62,15 @@ export default function Home() {
     async function loadNews() {
       setLoading(true);
       const news = await fetchNews(category);
-      console.log("뉴스 데이터:", news);
+
+      if (typeof news[0] === "string") {
+        setErrorMessage(news[0]);
+        setArticles([]);
+      } else {
+        setErrorMessage(null);
+        setArticles(news);
+      }
+      // console.log("뉴스 데이터:", news);
       setArticles(news);
       setLoading(false);
     }
@@ -80,7 +89,10 @@ export default function Home() {
       const summaryArray = response?.summary;
 
       if (Array.isArray(summaryArray) && summaryArray.length > 0) {
-        setSummaries((prev) => ({ ...prev, [link]: summaryArray[0] }));
+        setSummaries((prev) => ({
+          ...prev,
+          [link.toLowerCase()]: summaryArray[0],
+        }));
       }
     },
     []
@@ -137,73 +149,73 @@ export default function Home() {
       )}
 
       {/* 서비스 점검 메세지 */}
-      {!loading && articles.length === 1 && typeof articles[0] === "string" && (
-        <ErrorMessage message={articles[0]} />
-      )}
+      {!loading && errorMessage && <ErrorMessage message={errorMessage} />}
 
-      <div className="font-sans columns-1 md:columns-2 gap-4 mt-4">
-        {articles.map((article) => {
-          const summary = summaries[article.link];
+      {!loading && !errorMessage && articles.length > 0 && (
+        <div className="font-sans columns-1 md:columns-2 gap-4 mt-4">
+          {articles.map((article) => {
+            const summary = summaries[article.link];
 
-          return (
-            <div
-              key={article.link}
-              className="mb-4 break-inside-avoid rounded-xl border bg-background text-card-foreground shadow"
-            >
-              <div className="p-6 flex flex-row items-center justify-between space-y-0 pb-2">
-                <p className="text-base font-bold">{article.title}</p>
-              </div>
-              <div className="p-6 pt-0 pb-0">
-                <p className="text-xs text-muted-foreground">
-                  {article.source_name}
-                </p>
-
-                {!summary && (
-                  <p className="text-sm mt-2 text-foreground">
-                    {article.description || "설명이 없습니다."}
+            return (
+              <div
+                key={article.link}
+                className="mb-4 break-inside-avoid rounded-xl border bg-background text-card-foreground shadow"
+              >
+                <div className="p-6 flex flex-row items-center justify-between space-y-0 pb-2">
+                  <p className="text-base font-bold">{article.title}</p>
+                </div>
+                <div className="p-6 pt-0 pb-0">
+                  <p className="text-xs text-muted-foreground">
+                    {article.source_name}
                   </p>
-                )}
 
-                {summary && (
-                  <div className="mt-2 bg-primary/10 p-4 rounded-lg shadow-inner">
-                    <h3 className="font-sans text-primary mb-2">세줄요약</h3>
-                    <ul className="list-disc list-inside text-sm font-sans text-foreground space-y-1">
-                      <li>{summary["1"]}</li>
-                      <li>{summary["2"]}</li>
-                      <li>{summary["3"]}</li>
-                    </ul>
-                  </div>
-                )}
-              </div>
+                  {!summary && (
+                    <p className="text-sm mt-2 text-foreground">
+                      {article.description || "설명이 없습니다."}
+                    </p>
+                  )}
 
-              <div className="mt-4 flex flex-col md:flex-row justify-end gap-2 px-6 pb-4">
-                {article.description && (
+                  {summary && (
+                    <div className="mt-2 bg-primary/10 p-4 rounded-lg shadow-inner">
+                      <h3 className="font-sans text-primary mb-2">세줄요약</h3>
+                      <ul className="list-disc list-inside text-sm font-sans text-foreground space-y-1">
+                        <li>{summary["1"]}</li>
+                        <li>{summary["2"]}</li>
+                        <li>{summary["3"]}</li>
+                      </ul>
+                    </div>
+                  )}
+                </div>
+
+                <div className="mt-4 flex flex-col md:flex-row justify-end gap-2 px-6 pb-4">
+                  {article.description && (
+                    <Button
+                      className="cursor-pointer bg-background text-foreground border"
+                      onClick={() =>
+                        handleSummarize(article.link, article.description)
+                      }
+                    >
+                      요약하기
+                    </Button>
+                  )}
                   <Button
-                    className="cursor-pointer bg-background text-foreground border"
-                    onClick={() =>
-                      handleSummarize(article.link, article.description)
-                    }
+                    className="bg-background text-foreground border"
+                    asChild
                   >
-                    요약하기
+                    <a
+                      href={article.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      기사 보기
+                    </a>
                   </Button>
-                )}
-                <Button
-                  className="bg-background text-foreground border"
-                  asChild
-                >
-                  <a
-                    href={article.link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    기사 보기
-                  </a>
-                </Button>
+                </div>
               </div>
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

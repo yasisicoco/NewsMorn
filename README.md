@@ -103,7 +103,6 @@ bun dev
 - [x] 다크모드/라이트모드 스타일링 개선
 - [ ] Skeleton UI 기능 추가
 - [x] Vercel 배포
-- [ ] news/route.ts 의 api소진, serviceMaintenance 분기처리 추가
-- [ ] 프론트 쪽 점검 처리 페이지 추가 (Service Update Page 제작)
+- [x] news/route.ts 의 api소진, serviceMaintenance 분기처리 추가
 - [ ] `metadata` 추가
 - [ ] vercel `webanalysis` 추가
