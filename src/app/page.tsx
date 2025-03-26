@@ -12,6 +12,7 @@ import {
   CarouselContent,
   CarouselItem,
 } from "@/components/ui/carousel";
+import ErrorMessage from "@/components/errorMessage";
 
 interface Article {
   title: string;
@@ -60,7 +61,7 @@ export default function Home() {
     async function loadNews() {
       setLoading(true);
       const news = await fetchNews(category);
-      // console.log("뉴스 데이터:", news);
+      console.log("뉴스 데이터:", news);
       setArticles(news);
       setLoading(false);
     }
@@ -101,6 +102,7 @@ export default function Home() {
         )}
       </div>
 
+      {/* Category */}
       <Carousel className="w-full mx-auto bg-[#F4F4F5] p-2 rounded-lg dark:bg-[#27272A]">
         <CarouselContent className="-ml-1 ">
           {categories.map((cat, index) => (
@@ -127,10 +129,16 @@ export default function Home() {
         </CarouselContent>
       </Carousel>
 
+      {/* 로딩 UI */}
       {loading && (
         <p className="text-center text-muted-foreground mt-4">
           뉴스 불러오는 중...
         </p>
+      )}
+
+      {/* 서비스 점검 메세지 */}
+      {!loading && articles.length === 1 && typeof articles[0] === "string" && (
+        <ErrorMessage message={articles[0]} />
       )}
 
       <div className="font-sans columns-1 md:columns-2 gap-4 mt-4">
