@@ -6,11 +6,11 @@ export const metadata = {
   openGraph: {
     title: "NewsMorn - AI 뉴스 요약 서비스",
     description: "AI의 3줄 요약으로 최신 뉴스를 빠르고 쉽게 이해하세요😊",
-    url: "https://newsmorn.vercel.app",
+    url: "https://news-morn.vercel.app",
     siteName: "NewsMorn",
     images: [
       {
-        url: "https://newsmorn.vercel.app/og-image.png",
+        url: "https://news-morn.vercel.app/og-image.png",
         width: 1200,
         height: 630,
         alt: "NewsMorn - AI 뉴스 요약 서비스",
@@ -22,7 +22,7 @@ export const metadata = {
     card: "summary_large_image",
     title: "NewsMorn - AI 뉴스 요약",
     description: "뉴스를 빠르고 쉽게 이해하세요.",
-    images: ["https://newsmorn.vercel.app/og-image.png"],
+    images: ["https://news-morn.vercel.app/og-image.png"],
   },
   // robots: {
   //   index: true,
