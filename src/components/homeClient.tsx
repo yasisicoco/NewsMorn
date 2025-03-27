@@ -152,7 +152,7 @@ export default function HomeClient() {
       {!loading && errorMessage && <ErrorMessage message={errorMessage} />}
 
       {!loading && !errorMessage && articles.length > 0 && (
-        <div className="font-sans columns-1 lg:columns-2 xl:columns-3 gap-4 mt-4">
+        <div className="font-sans columns-1 md:columns-2 xl:columns-3 gap-4 mt-4">
           {articles.map((article) => {
             const isLoadingSummary =
               loadingSummaries[article.link.toLowerCase()];
