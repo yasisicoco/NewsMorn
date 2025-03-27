@@ -174,7 +174,7 @@ export default function HomeClient() {
                     <div className="mt-2 bg-primary/4 p-4 rounded-lg border shadow-inner">
                       <h3 className="font-sans text-primary mb-2">
                         <Skeleton
-                          width="10%"
+                          width="30%"
                           height={20}
                           borderRadius={8}
                           baseColor="var(--skeleton-base)"
@@ -184,7 +184,15 @@ export default function HomeClient() {
                       </h3>
                       <div className="list-disc list-inside text-sm font-sans text-foreground space-y-1">
                         <Skeleton
-                          width="40%"
+                          width="70%"
+                          height={20}
+                          borderRadius={8}
+                          baseColor="var(--skeleton-base)"
+                          highlightColor="var(--skeleton-highlight)"
+                          duration={1.2}
+                        />
+                        <Skeleton
+                          width="90%"
                           height={20}
                           borderRadius={8}
                           baseColor="var(--skeleton-base)"
@@ -193,14 +201,6 @@ export default function HomeClient() {
                         />
                         <Skeleton
                           width="60%"
-                          height={20}
-                          borderRadius={8}
-                          baseColor="var(--skeleton-base)"
-                          highlightColor="var(--skeleton-highlight)"
-                          duration={1.2}
-                        />
-                        <Skeleton
-                          width="50%"
                           height={20}
                           borderRadius={8}
                           baseColor="var(--skeleton-base)"
