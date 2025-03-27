@@ -1,5 +1,6 @@
 "use client";
 
+import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -15,10 +16,10 @@ export default function ThemeToggle() {
   return (
     isClient && (
       <Button
-        className="mt-4 cursor-pointer bg-background border"
+        className="mt-4 cursor-pointer bg-foreground/85 border"
         onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
       >
-        {theme === "dark" ? "☀️" : "🌙"}
+        {theme === "dark" ? <Sun /> : <Moon />}
       </Button>
     )
   );
