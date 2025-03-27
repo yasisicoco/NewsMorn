@@ -13,6 +13,9 @@ import {
   CarouselItem,
 } from "@/components/ui/carousel";
 
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
+
 interface Article {
   title: string;
   link: string;
@@ -51,6 +54,10 @@ export default function HomeClient() {
   const [summaries, setSummaries] = useState<SummaryMap>({});
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
+  const [loadingSummaries, setLoadingSummaries] = useState<{
+    [key: string]: boolean;
+  }>({});
+
   useEffect(() => {
     async function loadNews() {
       setLoading(true);
@@ -76,13 +83,24 @@ export default function HomeClient() {
         return;
       }
 
-      const response = await summarizeNews(description);
-      const summaryArray = response?.summary;
+      setLoadingSummaries((prev) => ({ ...prev, [link.toLowerCase()]: true }));
 
-      if (Array.isArray(summaryArray) && summaryArray.length > 0) {
-        setSummaries((prev) => ({
+      try {
+        const response = await summarizeNews(description);
+        const summaryArray = response?.summary;
+
+        if (Array.isArray(summaryArray) && summaryArray.length > 0) {
+          setSummaries((prev) => ({
+            ...prev,
+            [link.toLowerCase()]: summaryArray[0],
+          }));
+        }
+      } catch (e) {
+        console.log(e);
+      } finally {
+        setLoadingSummaries((prev) => ({
           ...prev,
-          [link.toLowerCase()]: summaryArray[0],
+          [link.toLowerCase()]: false,
         }));
       }
     },
@@ -135,6 +153,8 @@ export default function HomeClient() {
       {!loading && !errorMessage && articles.length > 0 && (
         <div className="font-sans columns-1 md:columns-2 gap-4 mt-4">
           {articles.map((article) => {
+            const isLoadingSummary =
+              loadingSummaries[article.link.toLowerCase()];
             const summary = summaries[article.link.toLowerCase()];
             return (
               <div
@@ -149,13 +169,20 @@ export default function HomeClient() {
                     {article.source_name}
                   </p>
 
-                  {!summary && (
-                    <p className="text-sm mt-2 text-foreground">
-                      {article.description || "설명이 없습니다."}
-                    </p>
-                  )}
-
-                  {summary && (
+                  {isLoadingSummary ? (
+                    // Skeleton UI
+                    <div className="mt-2 bg-primary/10 p-4 rounded-lg shadow-inner">
+                      <h3 className="font-sans text-primary mb-2">
+                        <Skeleton width="10%" height={20} />
+                      </h3>
+                      <div className="list-disc list-inside text-sm font-sans text-foreground space-y-1">
+                        <Skeleton width="40%" height={20} />
+                        <Skeleton width="60%" height={20} />
+                        <Skeleton width="50%" height={20} />
+                      </div>
+                    </div>
+                  ) : summary ? (
+                    // 실제 요약
                     <div className="mt-2 bg-primary/10 p-4 rounded-lg shadow-inner">
                       <h3 className="font-sans text-primary mb-2">세줄요약</h3>
                       <ul className="list-disc list-inside text-sm font-sans text-foreground space-y-1">
@@ -164,6 +191,11 @@ export default function HomeClient() {
                         <li>{summary["3"]}</li>
                       </ul>
                     </div>
+                  ) : (
+                    // 설명만
+                    <p className="text-sm mt-2 text-foreground">
+                      {article.description || "설명이 없습니다."}
+                    </p>
                   )}
                 </div>
 
