@@ -13,6 +13,7 @@ import {
   CarouselItem,
 } from "@/components/ui/carousel";
 
+import { Loader2 } from "lucide-react";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 
@@ -143,9 +144,9 @@ export default function HomeClient() {
       </Carousel>
 
       {loading && (
-        <p className="text-center text-muted-foreground mt-4">
-          뉴스 불러오는 중...
-        </p>
+        <div className="flex justify-center items-center mt-8">
+          <Loader2 className="animate-spin w-6 h-6 text-muted-foreground" />
+        </div>
       )}
 
       {!loading && errorMessage && <ErrorMessage message={errorMessage} />}
