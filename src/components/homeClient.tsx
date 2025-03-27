@@ -129,7 +129,7 @@ export default function HomeClient() {
                 }}
                 className={`w-full h-full cursor-pointer text-center border-none overflow-hidden transition-all ${
                   category === cat
-                    ? "bg-white text-zinc-900 font-bold dark:bg-[#09090B] dark:text-[#FAFAFA]"
+                    ? "bg-white text-zinc-900 font-mono font-bold dark:bg-[#09090B] dark:text-[#FAFAFA]"
                     : "bg-[#F4F4F5] text-zinc-400 dark:bg-[#27272A] dark:text-[#626268]"
                 }`}
               >
@@ -151,7 +151,7 @@ export default function HomeClient() {
       {!loading && errorMessage && <ErrorMessage message={errorMessage} />}
 
       {!loading && !errorMessage && articles.length > 0 && (
-        <div className="font-sans columns-1 md:columns-2 gap-4 mt-4">
+        <div className="font-sans columns-1 lg:columns-2 xl:columns-3 gap-4 mt-4">
           {articles.map((article) => {
             const isLoadingSummary =
               loadingSummaries[article.link.toLowerCase()];
