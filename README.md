@@ -1,4 +1,4 @@
-# 📰 NewsMorn - AI 기반 뉴스 요약 서비스
+# 📰 NewsMorn - AI 기반 뉴스 요약 서비스 [바로가기](https://news-morn.vercel.app/)
 
 <p align="center">
   <img src="./public/demo1.gif" width="75%" />
