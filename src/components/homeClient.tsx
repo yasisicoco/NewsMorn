@@ -13,6 +13,7 @@ import {
   CarouselItem,
 } from "@/components/ui/carousel";
 
+import { Loader2 } from "lucide-react";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 
@@ -129,7 +130,7 @@ export default function HomeClient() {
                 }}
                 className={`w-full h-full cursor-pointer text-center border-none overflow-hidden transition-all ${
                   category === cat
-                    ? "bg-white text-zinc-900 font-bold dark:bg-[#09090B] dark:text-[#FAFAFA]"
+                    ? "bg-white text-zinc-900 font-mono font-bold dark:bg-[#09090B] dark:text-[#FAFAFA]"
                     : "bg-[#F4F4F5] text-zinc-400 dark:bg-[#27272A] dark:text-[#626268]"
                 }`}
               >
@@ -143,15 +144,15 @@ export default function HomeClient() {
       </Carousel>
 
       {loading && (
-        <p className="text-center text-muted-foreground mt-4">
-          뉴스 불러오는 중...
-        </p>
+        <div className="flex justify-center items-center mt-8">
+          <Loader2 className="animate-spin w-6 h-6 text-muted-foreground" />
+        </div>
       )}
 
       {!loading && errorMessage && <ErrorMessage message={errorMessage} />}
 
       {!loading && !errorMessage && articles.length > 0 && (
-        <div className="font-sans columns-1 md:columns-2 gap-4 mt-4">
+        <div className="font-sans columns-1 md:columns-2 xl:columns-3 gap-4 mt-4">
           {articles.map((article) => {
             const isLoadingSummary =
               loadingSummaries[article.link.toLowerCase()];
@@ -171,19 +172,47 @@ export default function HomeClient() {
 
                   {isLoadingSummary ? (
                     // Skeleton UI
-                    <div className="mt-2 bg-primary/10 p-4 rounded-lg shadow-inner">
+                    <div className="mt-2 bg-primary/4 p-4 rounded-lg border shadow-inner">
                       <h3 className="font-sans text-primary mb-2">
-                        <Skeleton width="10%" height={20} />
+                        <Skeleton
+                          width="30%"
+                          height={20}
+                          borderRadius={8}
+                          baseColor="var(--skeleton-base)"
+                          highlightColor="var(--skeleton-highlight)"
+                          duration={1.2}
+                        />
                       </h3>
                       <div className="list-disc list-inside text-sm font-sans text-foreground space-y-1">
-                        <Skeleton width="40%" height={20} />
-                        <Skeleton width="60%" height={20} />
-                        <Skeleton width="50%" height={20} />
+                        <Skeleton
+                          width="70%"
+                          height={20}
+                          borderRadius={8}
+                          baseColor="var(--skeleton-base)"
+                          highlightColor="var(--skeleton-highlight)"
+                          duration={1.2}
+                        />
+                        <Skeleton
+                          width="90%"
+                          height={20}
+                          borderRadius={8}
+                          baseColor="var(--skeleton-base)"
+                          highlightColor="var(--skeleton-highlight)"
+                          duration={1.2}
+                        />
+                        <Skeleton
+                          width="60%"
+                          height={20}
+                          borderRadius={8}
+                          baseColor="var(--skeleton-base)"
+                          highlightColor="var(--skeleton-highlight)"
+                          duration={1.2}
+                        />
                       </div>
                     </div>
                   ) : summary ? (
                     // 실제 요약
-                    <div className="mt-2 bg-primary/10 p-4 rounded-lg shadow-inner">
+                    <div className="mt-2 bg-primary/4 p-4 rounded-lg border shadow-inner">
                       <h3 className="font-sans text-primary mb-2">세줄요약</h3>
                       <ul className="list-disc list-inside text-sm font-sans text-foreground space-y-1">
                         <li>{summary["1"]}</li>
